@@ -1,0 +1,7 @@
+{
+  "name": "Cuzzle",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
