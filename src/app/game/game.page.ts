@@ -9,6 +9,7 @@ import { Platform, IonRange } from '@ionic/angular';
 import { ImageManipulatorService } from '../services/image-manipulator.service';
 import { ImageGeneratorService } from '../services/image-generator.service';
 import { UiService } from '../services/ui.service';
+import { Share } from '@capacitor/share';
 
 @Component({
   selector: 'app-game',
@@ -24,6 +25,7 @@ export class GamePage implements OnInit {
   @ViewChild('magenta') magenta: IonRange;
   @ViewChild('yellow') yellow: IonRange;
   @ViewChild('black') black: IonRange;
+  @ViewChild('info') info: HTMLDivElement;
   pC: HTMLCanvasElement;
   sC: HTMLCanvasElement;
   tC: HTMLCanvasElement;
@@ -38,6 +40,12 @@ export class GamePage implements OnInit {
   maxTint = 100;
   public Tint = 100;
   card;
+  currentRGB;
+  showButtonB = false;
+  showButtonS = false;
+  showButtonSh = false;
+  tmpP = 0;
+  completed=0;
 
   constructor(
     private platform: Platform,
@@ -47,33 +55,46 @@ export class GamePage implements OnInit {
   ) {
     this.width = this.platform.width();
     this.height = this.platform.height();
-    if (this.width > 1024) this.width = 1024;
+    let portrait = true;
+    if (this.width > this.height) portrait = false;
+
+    if (!portrait) this.width = this.height * 0.6;
+    if (portrait && this.width > 1024) this.width = 1024;
     for (let i = 0; i < 256; i++) {
       this.map[i] = new Array<number>(256);
+    }
+    for (let i = 0; i < this.map.length; i++) {
+      for (let j = 0; j < this.map.length; j++) {
+        this.map[i][j] = 0;
+      }
     }
   }
   ngOnInit(): void {
     //
     this.card = document.querySelector('.card');
-   
   }
 
   public doTry() {
-    if(this.nTry==3) return;
-    let c = parseInt(this.cyan.value+"");
-    let m = parseInt(this.magenta.value+"");
-    let y = parseInt(this.yellow.value+"");
-    let k = parseInt(this.black.value+"");
-    const [r,g,b]=this.iM.cmyk2rgb(c,m,y,k);
+    if (this.nTry == 3) return;
+    let c = parseInt(this.cyan.value + '');
+    let m = parseInt(this.magenta.value + '');
+    let y = parseInt(this.yellow.value + '');
+    let k = parseInt(this.black.value + '');
+    const [r, g, b] = this.iM.cmyk2rgb(c, m, y, k);
     this.nTry++;
-    this.valuesTray.push(this.iM.rgbToHex(r,g,b));
-    for(let i=this.valuesTray.length-1;i>=0;i--){
-      console.log(this.valuesTray[i]+"--"+i)
-      this.iM.drawTry(this.tC,this.valuesTray[i],i+1);
+    this.valuesTray.push(this.iM.rgbToHex(r, g, b));
+    for (let i = this.valuesTray.length - 1; i >= 0; i--) {
+      console.log(this.valuesTray[i] + '--' + i);
+      this.iM.drawTry(this.tC, this.valuesTray[i], i + 1);
     }
-    this.card.classList.toggle('is-flipped');
+    let points = this.iM.deltaE(this.currentRGB, [r, g, b]);
+    this.Tint -= 20;
+    this.flipToInfo('points', {
+      points: 100 - points,
+      tries: this.nTry,
+      color: [r, g, b],
+    });
   }
-
 
   async ionViewDidEnter() {
     await this.UI.showLoading();
@@ -100,6 +121,8 @@ export class GamePage implements OnInit {
 
     this.play();
     this.UI.closeLoading();
+    this.showPanel('main');
+    this.showPanel('panel');
     //this.iM.drawBoard(this.pxC,128);
   }
 
@@ -110,8 +133,8 @@ export class GamePage implements OnInit {
     this.iM.clearCanvas(this.tC);
     const [x, y] = this.getCoord();
     const [r, g, b] = this.iM.getColor(this.sC, x, y);
-
-    this.iM.fillCanvas(this.pC, this.iM.gbToHex([r, g, b]));
+    this.currentRGB = [r, g, b];
+    this.iM.fillCanvas(this.pC, this.iM.rgbToHex(r, g, b));
     this.prepareTint();
   }
 
@@ -132,6 +155,123 @@ export class GamePage implements OnInit {
     if (!found) {
       //game finished
     }
+    console.log([x, y]);
     return [x, y];
+  }
+
+  public hidePanel(id) {
+    document.getElementById(id).classList.remove('shown');
+  }
+  public showPanel(id) {
+    document.getElementById(id).classList.add('shown');
+  }
+  public flipToInfo(screen?, data?) {
+    document.getElementById('infodetail').innerHTML = '';
+    if (screen == 'points') {
+      if (data.points > 70 && this.Tint > 0) {
+        this.tmpP = data.points;
+        this.showButtonS = true;
+      } else {
+        if (data.tries < 3 && this.Tint > 0) {
+          this.showButtonB = true;
+        } else {
+          document.getElementById('infodetail').innerHTML = 'GAME OVER';
+        }
+      }
+      if (document.getElementById('infodetail').innerHTML != 'GAME OVER') {
+        let message = '';
+        if (data.points > 90) {
+          message = 'VERY IMPRESSIVE';
+        } else if (data.points > 80) {
+          message = 'GREAT';
+        } else if (data.points > 70) {
+          message = 'NOT TOO BAD';
+        } else if (data.points > 60) {
+          message = 'ALMOST';
+        } else if (data.points > 50) {
+          message = 'YOU CAN DO IT BETTER';
+        } else {
+          message = 'BAD';
+        }
+        document.getElementById('infodetail').innerHTML = message;
+      }
+      console.log(this.info);
+    }
+
+    document.getElementById('tools').classList.add('disabled');
+    this.card.classList.add('is-flipped');
+    document.getElementById('info').classList.remove('disabled');
+  }
+  public flipToTools() {
+    //only reset if finish
+    this.showButtonB = false;
+    this.showButtonS = false;
+    document.getElementById('info').classList.add('disabled');
+    this.card.classList.remove('is-flipped');
+    document.getElementById('tools').classList.remove('disabled');
+  }
+  public async solve() {
+    let c = parseInt(this.cyan.value + '');
+    let m = parseInt(this.magenta.value + '');
+    let y = parseInt(this.yellow.value + '');
+    let k = parseInt(this.black.value + '');
+    const [r, g, b] = this.iM.cmyk2rgb(c, m, y, k);
+    await this.UI.showLoading();
+    //this.hidePanel("main");
+    let founds = await this.iM.solve(
+      [r, g, b],
+      this.tmpP,
+      this.map,
+      this.sC,
+      this.pxC
+    );
+    //this.showPanel("main");
+    if (founds > 10) {
+      this.Tint += 5;
+    }
+    if (founds > 100) {
+      this.Tint += 5;
+    }
+    if (founds > 1000) {
+      this.Tint += 5;
+    }
+    this.UI.closeLoading();
+    this.completed=Math.floor(this.isComplete()*100);
+    if (this.completed < 100) {
+      this.play();
+      this.flipToTools();
+    } else {
+      this.showButtonB = false;
+      this.showButtonS = false;
+      document.getElementById('infodetail').innerHTML =
+        'COMPLETED, ' + this.Tint + ' tint left';
+    }
+  }
+  public isComplete() {
+    let c = 0;
+    let t = 0;
+    for (let i = 0; i < this.map.length; i++) {
+      for (let j = 0; j < this.map.length; j++) {
+        t++;
+        if (this.map[i][j] == 1) {
+          c++;
+        }
+      }
+    }
+    return c / t;
+  }
+  public async share() {
+    if (Share.canShare()) {
+      await Share.share({
+        title: 'See cool stuff',
+        text: 'Really awesome thing you need to see right meow',
+        url: 'http://ionicframework.com/',
+        dialogTitle: 'Share with buddies',
+      });
+    }
+    //https://twitter.com/intent/tweet?url=wordle.danielfrg.com&text=Wordle%20(ES)%20%2330%204%2F6%0A%0A%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A8%E2%AC%9C%F0%9F%9F%A8%0A%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%0A%0A
+    //https://telegram.me/share/url?url=wordle.danielfrg.com&text=Wordle%20(ES)%20%2330%204%2F6%0A%0A%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A8%E2%AC%9C%F0%9F%9F%A8%0A%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%0A%0A
+    //https://api.whatsapp.com/send?text=Wordle%20(ES)%20%2330%204%2F6%0A%0A%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A8%E2%AC%9C%F0%9F%9F%A8%0A%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%0A%0A%20wordle.danielfrg.com
+    //https://www.facebook.com/sharer/sharer.php?u=wordle.danielfrg.com
   }
 }
