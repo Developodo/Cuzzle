@@ -15,14 +15,18 @@ export class ImageManipulatorService {
     let parts=canvas.width/3;
     let ctx: CanvasRenderingContext2D = canvas.getContext('2d');
     ctx.fillStyle = color;
+    ctx.strokeStyle='white';
     ctx.font = '30px Arial';
     ctx.beginPath();
     ctx.moveTo(canvas.width, canvas.height);
     ctx.lineTo(canvas.width, Math.round(canvas.height -parts*n));
+    ctx.stroke()
     ctx.lineTo(Math.round(canvas.width -parts*n), canvas.height);
+    ctx.stroke()
     ctx.closePath();
+    ctx.stroke()
     ctx.fill();
-    ctx.fillStyle = '#000';  //opossite del tintento
+    ctx.fillStyle = this.invertColor(color,color);  //opossite del tintento
     ctx.fillText(
       n,
       canvas.width - 20,
@@ -85,7 +89,8 @@ export class ImageManipulatorService {
           if (x % 1000 === 0)
             await this.pause()
           let colorx=canvasP.getContext('2d').getImageData(i, j, 1, 1).data;
-          if(this.deltaE(color,colorx)<(100-points*0.8)){
+
+          if(this.deltaE(color,colorx)<points/3){
             map[i][j]=1; s++;
             let context=canvasS.getContext('2d');
             context.beginPath();
@@ -160,4 +165,39 @@ export class ImageManipulatorService {
     z = (z > 0.008856) ? Math.pow(z, 1/3) : (7.787 * z) + 16/116;
     return [(116 * y) - 16, 500 * (x - y), 200 * (y - z)]
   }
+
+
+  public invertColor(hex, bw) {
+    if (hex.indexOf('#') === 0) {
+        hex = hex.slice(1);
+    }
+    // convert 3-digit hex to 6-digits.
+    if (hex.length === 3) {
+        hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    }
+    if (hex.length !== 6) {
+        throw new Error('Invalid HEX color.');
+    }
+    let r:any = parseInt(hex.slice(0, 2), 16);
+    let g:any = parseInt(hex.slice(2, 4), 16);
+    let b:any = parseInt(hex.slice(4, 6), 16);
+    if (bw) {
+        // https://stackoverflow.com/a/3943023/112731
+        return (r * 0.299 + g * 0.587 + b * 0.114) > 186
+            ? '#000000'
+            : '#FFFFFF';
+    }
+    // invert color components
+    r = (255 - r).toString(16);
+    g = (255 - g).toString(16);
+    b = (255 - b).toString(16);
+    // pad each with zeros and return
+    return "#" + this.padZero(r) + this.padZero(g) + this.padZero(b);
+}
+
+public padZero(str, len?) {
+  len = len || 2;
+  var zeros = new Array(len).join('0');
+  return (zeros + str).slice(-len);
+}
 }

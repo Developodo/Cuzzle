@@ -45,7 +45,7 @@ export class GamePage implements OnInit {
   showButtonS = false;
   showButtonSh = false;
   tmpP = 0;
-  completed=0;
+  completed = 0;
 
   constructor(
     private platform: Platform,
@@ -88,7 +88,10 @@ export class GamePage implements OnInit {
       this.iM.drawTry(this.tC, this.valuesTray[i], i + 1);
     }
     let points = this.iM.deltaE(this.currentRGB, [r, g, b]);
-    this.Tint -= 20;
+    this.Tint -= 10;
+    if(100 - points<85) this.Tint-=5;
+    if(100 - points<70) this.Tint-=5;
+    if(this.Tint<0) this.Tint=0;
     this.flipToInfo('points', {
       points: 100 - points,
       tries: this.nTry,
@@ -168,7 +171,7 @@ export class GamePage implements OnInit {
   public flipToInfo(screen?, data?) {
     document.getElementById('infodetail').innerHTML = '';
     if (screen == 'points') {
-      if (data.points > 70 && this.Tint > 0) {
+      if (data.points >= 70 && this.Tint > 0) {
         this.tmpP = data.points;
         this.showButtonS = true;
       } else {
@@ -176,26 +179,29 @@ export class GamePage implements OnInit {
           this.showButtonB = true;
         } else {
           document.getElementById('infodetail').innerHTML = 'GAME OVER';
+          document.getElementById('tools').classList.add('disabled');
+          this.card.classList.add('is-flipped');
+          document.getElementById('info').classList.remove('disabled');
+          return;
         }
       }
-      if (document.getElementById('infodetail').innerHTML != 'GAME OVER') {
-        let message = '';
-        if (data.points > 90) {
-          message = 'VERY IMPRESSIVE';
-        } else if (data.points > 80) {
-          message = 'GREAT';
-        } else if (data.points > 70) {
-          message = 'NOT TOO BAD';
-        } else if (data.points > 60) {
-          message = 'ALMOST';
-        } else if (data.points > 50) {
-          message = 'YOU CAN DO IT BETTER';
-        } else {
-          message = 'BAD';
-        }
-        document.getElementById('infodetail').innerHTML = message;
+
+      let message = '';
+      data.points=Math.round(data.points);
+      if (data.points > 90) {
+        message = 'VERY IMPRESSIVE '+data.points+"% AFFINITY";
+      } else if (data.points > 80) {
+        message = 'GREAT '+data.points+"% AFFINITY";
+      } else if (data.points > 70) {
+        message = 'NOT TOO BAD '+data.points+"% AFFINITY";
+      } else if (data.points > 60) {
+        message = 'ALMOST '+data.points+"% AFFINITY";
+      } else if (data.points > 50) {
+        message = 'YOU CAN DO IT BETTER '+data.points+"% AFFINITY";
+      } else {
+        message = 'BAD '+data.points+"% AFFINITY";
       }
-      console.log(this.info);
+      document.getElementById('infodetail').innerHTML = message;
     }
 
     document.getElementById('tools').classList.add('disabled');
@@ -218,25 +224,29 @@ export class GamePage implements OnInit {
     const [r, g, b] = this.iM.cmyk2rgb(c, m, y, k);
     await this.UI.showLoading();
     //this.hidePanel("main");
+    //pasar el color en cuestión.
     let founds = await this.iM.solve(
-      [r, g, b],
+      /*[r, g, b],*/
+      this.currentRGB,
       this.tmpP,
       this.map,
       this.sC,
       this.pxC
     );
     //this.showPanel("main");
-    if (founds > 10) {
+    if (this.tmpP > 75) {
       this.Tint += 5;
     }
-    if (founds > 100) {
+    if (this.tmpP > 85) {
       this.Tint += 5;
     }
-    if (founds > 1000) {
+    if (this.tmpP > 95) {
       this.Tint += 5;
     }
+    if(this.Tint>100)this.Tint=100;
+
     this.UI.closeLoading();
-    this.completed=Math.floor(this.isComplete()*100);
+    this.completed = Math.floor(this.isComplete() * 100);
     if (this.completed < 100) {
       this.play();
       this.flipToTools();
