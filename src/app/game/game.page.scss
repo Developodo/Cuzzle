@@ -50,11 +50,19 @@ ion-col {
   }
   
   .card__face--front {
-   
+    -webkit-perspective: 0; /**safafi*/
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0,0,0);
+    visibility:visible;
+    backface-visibility: hidden;
   }
   
   .card__face--back {
-    
+    -webkit-perspective: 0;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translate3d(0,0,0);
+    visibility:visible;
+    backface-visibility: hidden;
     transform: rotateY(180deg);
   }
   

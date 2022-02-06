@@ -247,6 +247,7 @@ export class GamePage implements OnInit {
 
     this.UI.closeLoading();
     this.completed = Math.floor(this.isComplete() * 100);
+
     if (this.completed < 100) {
       this.play();
       this.flipToTools();
