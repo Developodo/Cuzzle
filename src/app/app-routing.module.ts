@@ -19,6 +19,10 @@ const routes: Routes = [
     path: 'winner',
     loadChildren: () => import('./winner/winner.module').then( m => m.WinnerPageModule)
   },
+  {
+    path: 'new',
+    loadChildren: () => import('./new/new.module').then( m => m.NewPageModule)
+  },
 ];
 
 @NgModule({

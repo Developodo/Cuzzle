@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Congratulations</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <a [href]="newInfo.url" style="text-decoration: none;" target="blank">
+  <ion-card>
+    <img [src]="newInfo.image" />
+    <ion-card-header>
+      <ion-card-subtitle>Fuente: {{newInfo.source}}</ion-card-subtitle>
+      <ion-card-title>{{newInfo.title}}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{newInfo.description}}
+    </ion-card-content>
+  </ion-card>
+</a>
+</ion-content>

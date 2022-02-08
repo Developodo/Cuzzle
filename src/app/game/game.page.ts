@@ -5,12 +5,13 @@ import {
   ViewChild,
   asNativeElements,
 } from '@angular/core';
-import { Platform, IonRange } from '@ionic/angular';
+import { Platform, IonRange, ModalController } from '@ionic/angular';
 import { ImageManipulatorService } from '../services/image-manipulator.service';
 import { ImageGeneratorService } from '../services/image-generator.service';
 import { UiService } from '../services/ui.service';
 import { Share } from '@capacitor/share';
 import { MediastackService } from '../services/mediastack.service';
+import { NewPage } from '../new/new.page';
 
 @Component({
   selector: 'app-game',
@@ -55,7 +56,7 @@ export class GamePage implements OnInit {
     private iM: ImageManipulatorService,
     private iG: ImageGeneratorService,
     private UI: UiService,
-    private m:MediastackService
+    public modalController: ModalController
   ) {
 
     
@@ -78,6 +79,7 @@ export class GamePage implements OnInit {
   ngOnInit(): void {
     //
     this.card = document.querySelector('.card');
+    
   }
 
   public doTry() {
@@ -124,6 +126,7 @@ export class GamePage implements OnInit {
     this.iM.drawTry(this.tC, '#0F0', 1);*/
     //OJO
     this.currentNew=await this.iG.getNew(this.sC);
+    
     //await this.iM.drawImage(this.sC, this.image);
     this.imageData = this.sC.getContext('2d').createImageData(256, 256);
 
@@ -149,7 +152,8 @@ export class GamePage implements OnInit {
   }
   public reset(){
     this.Tint=100;
-    this.iM.clearCanvas(this.pC);
+    let canvas=document.getElementById("pixels") as HTMLCanvasElement;
+    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < 256; i++) {
       for (let j = 0; j < 256; j++) {
         this.map[i][j]=0;
@@ -159,8 +163,13 @@ export class GamePage implements OnInit {
     this.showButtonR=false;
     this.flipToTools();
   }
-  private openNew(){
-
+  private async openNew(){
+    const modal = await this.modalController.create({
+      component: NewPage,
+      cssClass: 'my-custom-class',
+      componentProps: {'newInfo':this.currentNew}
+    });
+    return await modal.present();
   }
   private prepareTint() {}
   public getCoord() {
@@ -278,6 +287,7 @@ export class GamePage implements OnInit {
       this.showButtonS = false;
       document.getElementById('infodetail').innerHTML =
         'COMPLETED, ' + this.Tint + ' tint left';
+        await this.openNew();
     }
   }
   public isComplete() {
