@@ -90,7 +90,7 @@ export class ImageManipulatorService {
             await this.pause()
           let colorx=canvasP.getContext('2d').getImageData(i, j, 1, 1).data;
 
-          if(this.deltaE(color,colorx)<points/3){
+          if(this.deltaE(color,colorx)<points/2.5){
             map[i][j]=1; s++;
             let context=canvasS.getContext('2d');
             context.beginPath();

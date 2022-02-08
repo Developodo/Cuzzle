@@ -109,6 +109,14 @@ export class GamePage implements OnInit {
 
   async ionViewDidEnter() {
     await this.UI.showLoading();
+    let already=await localStorage.getItem(this.iG.getToday());
+    if(already && already!=""){
+      let info=JSON.parse(already);
+      this.openNew(info);
+    }
+
+
+
     this.image = await this.iG.getImage();
     this.pC = this.puzzleCanvas.nativeElement;
     this.sC = this.solutionCanvas.nativeElement;
@@ -164,11 +172,11 @@ export class GamePage implements OnInit {
     this.showButtonR=false;
     this.flipToTools();
   }
-  private async openNew(){
+  private async openNew(info?){
     const modal = await this.modalController.create({
       component: NewPage,
       cssClass: 'my-custom-class',
-      componentProps: {'newInfo':this.currentNew},
+      componentProps: info?info:{'newInfo':this.currentNew,'today':this.iG.getToday(),'tint':this.Tint},
       showBackdrop: false,
   backdropDismiss: false,
   animated: true,
@@ -225,17 +233,17 @@ export class GamePage implements OnInit {
       let message = '';
       data.points=Math.round(data.points);
       if (data.points > 90) {
-        message = 'VERY IMPRESSIVE '+data.points+"% AFFINITY";
+        message = 'Impresionante 8O , '+data.points+"% de afinidad";
       } else if (data.points > 80) {
-        message = 'GREAT '+data.points+"% AFFINITY";
+        message = 'Gran trabajo :D , '+data.points+"% de afinidad";
       } else if (data.points > 70) {
-        message = 'NOT TOO BAD '+data.points+"% AFFINITY";
+        message = 'No está mal :) , '+data.points+"% de afinidad";
       } else if (data.points > 60) {
-        message = 'ALMOST '+data.points+"% AFFINITY";
+        message = 'Casi :~ , '+data.points+"% de afinidad";
       } else if (data.points > 50) {
-        message = 'YOU CAN DO IT BETTER '+data.points+"% AFFINITY";
+        message = 'Ánimo, puedes hacerlo mejor :/ , '+data.points+"% de afinidad";
       } else {
-        message = 'BAD '+data.points+"% AFFINITY";
+        message = 'Fatal :( , '+data.points+"% de afinidad";
       }
       document.getElementById('infodetail').innerHTML = message;
     }
@@ -290,6 +298,9 @@ export class GamePage implements OnInit {
     } else {
       this.showButtonB = false;
       this.showButtonS = false;
+      await localStorage.setItem(this.iG.getToday(),JSON.stringify(
+        {'newInfo':this.currentNew,'today':this.iG.getToday(),'tint':this.Tint}
+      ))
       document.getElementById('infodetail').innerHTML =
         'COMPLETED, ' + this.Tint + ' tint left';
         await this.openNew();
@@ -308,18 +319,7 @@ export class GamePage implements OnInit {
     }
     return c / t;
   }
-  public async share() {
-    if (Share.canShare()) {
-      await Share.share({
-        title: 'See cool stuff',
-        text: 'Really awesome thing you need to see right meow',
-        url: 'http://ionicframework.com/',
-        dialogTitle: 'Share with buddies',
-      });
-    }
-    //https://twitter.com/intent/tweet?url=wordle.danielfrg.com&text=Wordle%20(ES)%20%2330%204%2F6%0A%0A%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A8%E2%AC%9C%F0%9F%9F%A8%0A%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%0A%0A
-    //https://telegram.me/share/url?url=wordle.danielfrg.com&text=Wordle%20(ES)%20%2330%204%2F6%0A%0A%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A8%E2%AC%9C%F0%9F%9F%A8%0A%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%0A%0A
-    //https://api.whatsapp.com/send?text=Wordle%20(ES)%20%2330%204%2F6%0A%0A%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A8%E2%AC%9C%F0%9F%9F%A8%0A%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A8%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%E2%AC%9C%F0%9F%9F%A9%F0%9F%9F%A9%0A%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%F0%9F%9F%A9%0A%0A%20wordle.danielfrg.com
-    //https://www.facebook.com/sharer/sharer.php?u=wordle.danielfrg.com
-  }
+
+    
+  
 }

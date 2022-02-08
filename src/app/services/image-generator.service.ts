@@ -13,16 +13,19 @@ export class ImageGeneratorService {
               private firestore: AngularFirestore) {
                 this.collection = this.firestore.collection("news");
                }
-
-  public getImage(){
-    return "/assets/images/test"+(Math.floor(Math.random() * 8)+1)+".jpg";
-  }
-  public async getNew(canvas){
+  public getToday(){
     let today:any = new Date();
     let dd = String(today.getDate()).padStart(2, '0');
     let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
     let yyyy = today.getFullYear();
     today = yyyy + '-' + mm + '-' + dd;
+    return today;
+  }
+  public getImage(){
+    return "/assets/images/test"+(Math.floor(Math.random() * 8)+1)+".jpg";
+  }
+  public async getNew(canvas){
+    let today=this.getToday();
 
     let n:firebase.default.firestore.DocumentSnapshot<unknown>=await this.collection.doc(today).get().toPromise();
     let currentNew:any=null;
