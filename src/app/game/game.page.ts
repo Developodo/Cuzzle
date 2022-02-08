@@ -151,6 +151,7 @@ export class GamePage implements OnInit {
     
   }
   public reset(){
+    this.completed=0;
     this.Tint=100;
     let canvas=document.getElementById("pixels") as HTMLCanvasElement;
     canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
@@ -167,7 +168,11 @@ export class GamePage implements OnInit {
     const modal = await this.modalController.create({
       component: NewPage,
       cssClass: 'my-custom-class',
-      componentProps: {'newInfo':this.currentNew}
+      componentProps: {'newInfo':this.currentNew},
+      showBackdrop: false,
+  backdropDismiss: false,
+  animated: true,
+  swipeToClose: true
     });
     return await modal.present();
   }
