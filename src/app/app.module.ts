@@ -11,18 +11,35 @@ import { ImageManipulatorService } from './services/image-manipulator.service';
 import { UiService } from './services/ui.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
+import { MediastackService } from './services/mediastack.service';
+import { HttpClientModule } from '@angular/common/http';
+import {AngularFireModule} from '@angular/fire/compat/'
+import { AngularFirestoreModule, AngularFirestore} from '@angular/fire/compat/firestore';
 
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, ServiceWorkerModule.register('ngsw-worker.js', {
-  enabled: environment.production,
-  // Register the ServiceWorker as soon as the app is stable
-  // or after 30 seconds (whichever comes first).
-  registrationStrategy: 'registerWhenStable:30000'
-})],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-  ImageGeneratorService,ImageManipulatorService,UiService],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    IonicModule.forRoot(),
+    AppRoutingModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFirestoreModule,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the app is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000',
+    }),
+  ],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    ImageGeneratorService,
+    ImageManipulatorService,
+    UiService,
+    MediastackService
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

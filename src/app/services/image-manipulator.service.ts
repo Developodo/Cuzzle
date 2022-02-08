@@ -33,14 +33,14 @@ export class ImageManipulatorService {
       canvas.height - parts*(n-1)-10
     );
   }
-  public async drawImage(canvas: HTMLCanvasElement, image: string) {
+  public async drawImage(canvas: HTMLCanvasElement, image: string,dx=0,dy=0) {
     return new Promise((resolve, reject) => {
       let ctx: CanvasRenderingContext2D = canvas.getContext('2d');
       let img = new Image();
       img.addEventListener('load', async () => {
         console.log('imagen cargada');
         console.log(img.src);
-        ctx.drawImage(img, 0, 0, 256, 256, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, dx, dy, 256, 256, 0, 0, canvas.width, canvas.height);
         resolve(null);
       });
       console.log(image);

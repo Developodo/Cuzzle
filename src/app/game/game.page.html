@@ -76,11 +76,13 @@
           <div id="infodetail" style="font-size: small;"></div>
           <ion-button *ngIf="showButtonB" (click)="this.flipToTools()">Try again</ion-button>
           <ion-button *ngIf="showButtonS" (click)="this.solve()">Solve</ion-button>
-          <ion-button *ngIf="showButtonSh" (click)="this.share()">Share</ion-button>
+          <ion-button *ngIf="showButtonR" (click)="this.reset()">Reset</ion-button>
         </div>
       </ion-col>
     </ion-row>
     </ion-grid>
+    <canvas id="joder"></canvas>
+
 </ion-content>
 <ion-footer class="ion-no-border">
   <ion-toolbar>

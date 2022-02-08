@@ -10,6 +10,7 @@ import { ImageManipulatorService } from '../services/image-manipulator.service';
 import { ImageGeneratorService } from '../services/image-generator.service';
 import { UiService } from '../services/ui.service';
 import { Share } from '@capacitor/share';
+import { MediastackService } from '../services/mediastack.service';
 
 @Component({
   selector: 'app-game',
@@ -46,13 +47,18 @@ export class GamePage implements OnInit {
   showButtonSh = false;
   tmpP = 0;
   completed = 0;
+  currentNew=null;
+  showButtonR=false;
 
   constructor(
     private platform: Platform,
     private iM: ImageManipulatorService,
     private iG: ImageGeneratorService,
-    private UI: UiService
+    private UI: UiService,
+    private m:MediastackService
   ) {
+
+    
     this.width = this.platform.width();
     this.height = this.platform.height();
     let portrait = true;
@@ -113,13 +119,12 @@ export class GamePage implements OnInit {
     this.pxC.height = this.pxC.width = this.width / 2.1;
 
     document.getElementById('hack').style.height = this.pC.height + 'px';
-
-    this.iM.fillCanvas(this.sC, '#F00');
-
+   
     /*this.iM.drawTry(this.tC, '#00F', 2);
     this.iM.drawTry(this.tC, '#0F0', 1);*/
-
-    await this.iM.drawImage(this.sC, this.image);
+    //OJO
+    this.currentNew=await this.iG.getNew(this.sC);
+    //await this.iM.drawImage(this.sC, this.image);
     this.imageData = this.sC.getContext('2d').createImageData(256, 256);
 
     this.play();
@@ -139,8 +144,24 @@ export class GamePage implements OnInit {
     this.currentRGB = [r, g, b];
     this.iM.fillCanvas(this.pC, this.iM.rgbToHex(r, g, b));
     this.prepareTint();
-  }
 
+    
+  }
+  public reset(){
+    this.Tint=100;
+    this.iM.clearCanvas(this.pC);
+    for (let i = 0; i < 256; i++) {
+      for (let j = 0; j < 256; j++) {
+        this.map[i][j]=0;
+        }
+      }
+    this.play();
+    this.showButtonR=false;
+    this.flipToTools();
+  }
+  private openNew(){
+
+  }
   private prepareTint() {}
   public getCoord() {
     let x = 0;
@@ -182,6 +203,7 @@ export class GamePage implements OnInit {
           document.getElementById('tools').classList.add('disabled');
           this.card.classList.add('is-flipped');
           document.getElementById('info').classList.remove('disabled');
+          this.showButtonR=true;
           return;
         }
       }
