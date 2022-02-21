@@ -18,7 +18,7 @@ ion-col {
     width: 100%;
     height: 200px;/**/
     /*border: 1px solid #CCC;*/
-    perspective: 300px;
+    /*perspective: 300px;*/
     transition: opacity 2s ease-out;
     opacity: 0;
   }
@@ -64,6 +64,22 @@ ion-col {
     visibility:visible;
     backface-visibility: hidden;
     transform: rotateY(180deg);
+  }
+  .myHelp{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba($color: #000000, $alpha: 0.5);
+    z-index:9000;
+    top:0;
+    left:0
+  }
+  #hackhelp{
+    -webkit-transition: max-height 1s; 
+  -moz-transition: max-height 1s; 
+  -ms-transition: max-height 1s; 
+  -o-transition: max-height 1s; 
+  transition: max-height 1s; 
   }
   
 

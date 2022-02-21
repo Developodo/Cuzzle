@@ -140,31 +140,16 @@ export class MediastackService {
   ]
   constructor(private http:HttpClient) { }
 
-  getnew():Promise<New>{
+  getnew(date):Promise<New>{
     return new Promise((resolve,reject)=>{
-      let mock:New={
-        author: null,
-        category: "general",
-        country: "es",
-        description: "Los nuevos servicios regionales casi duplican el número de vehículos que asciende a 48 autobuses para las áreas metropolitanas de Murcia y CartagenaLa puesta en marcha del nuevo servicio de transporte público interurbano Movibus ha supuesto la incorporación de 26 autobuses en las áreas metropolitanas de Murcia y Cartagena para realizar 216 nuevas expediciones diarias con el fin de adaptar los servicios a las necesidades reales de movilidad de los ciudadanos de la Región.“Son 26 autobuses más que transitan gracias a la implantación de Movibus y que antes no circulaban con el anterior...",
-        image: "https://cope-cdnmed.agilecontent.com/resources/jpg/6/6/1643832458666.jpg",
-        language: "es",
-        published_at: "2022-02-03T06:10:00+00:00",
-        source: "cope",
-        title: "Movibus incorpora 26 autobuses para realizar 216 nuevas expediciones diarias",
-        url: "https://www.cope.es/emisoras/region-de-murcia/murcia-provincia/murcia---san-javier/noticias/movibus-incorpora-autobuses-para-realizar-216-nuevas-expediciones-diarias-20220203_1765044"
-      }
       let url="http://api.mediastack.com/v1/news?"
             +"access_key="+environment.mediaStackApiKey
             +"&sources=cope"
             +"&languages=es"
             +"&category=general"
-            +"&date = 2022-02-08"
-            +"&keywords=tecnología"
+            +"&date="+date
+            //+"&keywords=tecnología"
             +"&limit=10"
-      /*url="http://api.mediastack.com/v1/sources"
-      +"?access_key="+environment.mediaStackApiKey
-      +"&search=bbc"*/
       this.http.get(url).subscribe((data:any)=>{
         let imageReg = /[\/.](gif|jpg|jpeg|tiff|png)$/i
         for(let n of data.data){

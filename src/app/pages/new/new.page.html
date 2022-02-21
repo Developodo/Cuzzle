@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-icon src="/assets/icon/logo.svg" slot="start" style="zoom:2.5;padding-left:5px"></ion-icon>
+    <ion-title style="font-size: small;">Te ha sobrado {{this.tint}}% de tinta</ion-title>
+    <app-share-buttons slot="secondary" [url]="url" [message]="message"></app-share-buttons>
+    </ion-toolbar>
+    
+</ion-header>
+
+<ion-content>
+  <a [href]="newInfo.url" style="text-decoration: none;" target="blank">
+  <ion-card>
+    
+    <ion-card-header>
+      <ion-card-subtitle>Fuente: {{newInfo.source}}</ion-card-subtitle>
+      <ion-card-title>{{newInfo.title}}</ion-card-title>
+      <ion-card-subtitle style="font-size: smaller; color:red">{{dcountText}}</ion-card-subtitle>
+    </ion-card-header>
+    <img [src]="newInfo.image" />
+    <ion-card-content>
+      {{newInfo.description}}
+    </ion-card-content>
+  </ion-card>
+</a>
+</ion-content>

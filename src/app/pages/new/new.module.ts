@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { NewPageRoutingModule } from './new-routing.module';
 
 import { NewPage } from './new.page';
+import { ShareButtonsComponent } from '../../components/share-buttons/share-buttons.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { NewPage } from './new.page';
     IonicModule,
     NewPageRoutingModule
   ],
-  declarations: [NewPage]
+  declarations: [NewPage,ShareButtonsComponent]
 })
 export class NewPageModule {}

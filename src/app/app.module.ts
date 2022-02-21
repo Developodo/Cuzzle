@@ -7,14 +7,14 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { ImageGeneratorService } from './services/image-generator.service';
-import { ImageManipulatorService } from './services/image-manipulator.service';
 import { UiService } from './services/ui.service';
 import { ServiceWorkerModule } from '@angular/service-worker';
 import { environment } from '../environments/environment';
 import { MediastackService } from './services/mediastack.service';
 import { HttpClientModule } from '@angular/common/http';
 import {AngularFireModule} from '@angular/fire/compat/'
-import { AngularFirestoreModule, AngularFirestore} from '@angular/fire/compat/firestore';
+import { AngularFirestoreModule} from '@angular/fire/compat/firestore';
+import { CopeRSSService } from './services/cope-rss.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -36,9 +36,9 @@ import { AngularFirestoreModule, AngularFirestore} from '@angular/fire/compat/fi
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     ImageGeneratorService,
-    ImageManipulatorService,
     UiService,
-    MediastackService
+    MediastackService,
+    CopeRSSService
   ],
   bootstrap: [AppComponent],
 })

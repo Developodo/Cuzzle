@@ -1,0 +1,32 @@
+<ion-item style="--background:cyan;margin-top:1px">
+  <ion-range  #cyan min="0" max="100" step="2" style="--bar-background:white;--bar-background-active:cyan;--bar-height:80px">
+    <ion-label slot="start" color="dark" style="font-size: larger;border:1px solid black;border-radius: 25%;padding:0px 5px;margin-left:-10px">{{this.cyan.value | number: '1.0-0'}} %</ion-label>
+    <ion-icon slot="end" name="sunny"></ion-icon>
+  </ion-range>
+</ion-item>
+
+
+<ion-item style="--background:magenta;margin-top:1px">
+  
+  <ion-range  #magenta min="0" max="100" step="2" style="--bar-background:white;--bar-background-active:magenta;--bar-height:80px">
+    <ion-label slot="start" color="light" style="font-size: larger;border:1px solid white;border-radius: 25%;padding:0px 5px;margin-left:-10px">{{this.magenta.value | number: '1.0-0'}} %</ion-label>
+    <ion-icon slot="end" name="sunny"></ion-icon>
+  </ion-range>
+</ion-item>
+
+<ion-item style="--background:yellow;margin-top:1px">
+  <ion-range  #yellow min="0" max="100" step="2" style="--bar-background:white;--bar-background-active:yellow;--bar-height:80px">
+    <ion-label slot="start" color="dark" style="font-size: larger;border:1px solid black;border-radius: 25%;padding:0px 5px;margin-left:-10px">{{this.yellow.value | number: '1.0-0'}} %</ion-label>
+
+    <ion-icon slot="end" name="sunny"></ion-icon>
+  </ion-range>
+</ion-item>
+
+<ion-item style="--background:black;margin-top:1px" >
+  <ion-range #black min="0" max="100" step="2" style="--bar-background:white;--bar-background-active:black;--bar-height:80px">
+    <ion-label slot="start" color="light" style="font-size: larger;border:1px solid white;border-radius: 25%;padding:0px 5px;margin-left:-10px">{{this.black.value | number: '1.0-0'}} %</ion-label>
+
+    <ion-icon color="light" slot="end" name="sunny"></ion-icon>
+  </ion-range>
+</ion-item>
+  <ion-button style="padding-top:10px" size="large"expand="block" color="light" (click)="doTry()"><ion-icon size="large" name="brush-outline"></ion-icon></ion-button>
