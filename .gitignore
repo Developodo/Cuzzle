@@ -30,6 +30,6 @@ npm-debug.log*
 /platforms
 /plugins
 /www
-**/enviroments/*
+**/environments/
 firebase*
-.firebase
+/.firebase
