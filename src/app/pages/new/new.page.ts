@@ -12,7 +12,7 @@ export class NewPage implements OnInit {
   @Input() tint: number;
 
   count;
-  dcountText=""
+  dcountText="Calculando tiempo para la próxima noticia..."
   counter;
   url;
   message;
