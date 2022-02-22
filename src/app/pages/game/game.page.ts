@@ -10,6 +10,7 @@ import { NewPage } from '../new/new.page';
 import { CanvasComponent } from '../../components/canvas/canvas.component';
 import { ColorUtilities } from '../../utilities/ColorUtilities';
 import { RangesComponent } from '../../components/ranges/ranges.component';
+import { AlertComponent } from '../../components/alert/alert.component';
 
 @Component({
   selector: 'app-game',
@@ -23,6 +24,7 @@ export class GamePage implements OnInit {
   @ViewChild('pixels') pixelsCanvas: CanvasComponent;
   @ViewChild('ranges') ranges:RangesComponent;
   @ViewChild('info') info: HTMLDivElement;
+  @ViewChild(AlertComponent) appalert:AlertComponent
 
   width: number;
   height: number;
@@ -273,8 +275,10 @@ export class GamePage implements OnInit {
     document.getElementById('info').classList.remove('disabled');
 
     if (data.points >= 70)
-      setTimeout(() => {
-        this.solve();
+      setTimeout(async () => {
+        let f=await this.solve();
+        if(this.completed<100)
+          this.appalert.openModal("Fenomenal, "+f+" píxeles resueltos ("+Math.floor((f/(256*256))*100)+"%), a por el siguiente color. Te queda "+this.Tint+" % de tinta y la imagen está completada al "+this.completed+"%.");
       }, 500);
   }
   public flipToTools() {
@@ -332,6 +336,7 @@ export class GamePage implements OnInit {
         'COMPLETADO, ' + this.Tint + ' tint left';
       await this.openNew();
     }
+    return founds;
   }
   public get isCompleted() {
     let c = 0;

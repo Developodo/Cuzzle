@@ -1,0 +1,20 @@
+
+<ion-modal [isOpen]="opened" [swipeToClose]="true" style="--width: 70%;--height: 40%">
+  <ng-template>
+    <ion-content (click)="closeModal()" style="display: flex;
+    align-items: center;
+    justify-content: center;">
+      <ion-grid style="display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;">
+    <ion-row>
+      <ion-col style="text-align: center;">
+        {{msg}}
+        <ion-button color="success" (click)="this.closeModal()">Seguir Jugando</ion-button>
+      </ion-col>
+    </ion-row>
+      </ion-grid>
+    </ion-content>
+  </ng-template>
+</ion-modal>

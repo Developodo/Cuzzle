@@ -11,6 +11,7 @@ import { CanvasComponent } from '../../components/canvas/canvas.component';
 import { NewPage } from '../new/new.page';
 import { ShareButtonsComponent } from '../../components/share-buttons/share-buttons.component';
 import { RangesComponent } from '../../components/ranges/ranges.component';
+import { AlertComponent } from '../../components/alert/alert.component';
 
 @NgModule({
   imports: [
@@ -19,6 +20,10 @@ import { RangesComponent } from '../../components/ranges/ranges.component';
     IonicModule,
     GamePageRoutingModule
   ],
-  declarations: [GamePage,NewPage,RangesComponent,ShareButtonsComponent,CanvasComponent]
+  declarations: [GamePage,NewPage,
+    RangesComponent,
+    ShareButtonsComponent,
+    CanvasComponent,
+    AlertComponent]
 })
 export class GamePageModule {}
