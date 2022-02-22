@@ -1,12 +1,23 @@
 import { CanvasComponent } from '../components/canvas/canvas.component';
 export class ColorUtilities{
+    /**
+     * Paints on canvasP all the pixels related to canvasS (in the same position)
+     * witch aren't solved yet and have an affinity range less than the number given
+     * by points
+     * @param color given as key to solve
+     * @param points tolerance to solve colors similar to color
+     * @param map array de pixels pending to be solved
+     * @param canvasP canvas to be painted
+     * @param canvasS canvas reference as solution
+     * @returns number of pixels painted
+     */
     public static async solve(
-        color,
-        points,
-        map,
+        color:string,
+        points:number,
+        map:Array<Array<number>>,
         canvasP: CanvasComponent,
         canvasS: CanvasComponent
-      ) {
+      ):Promise<number> {
         return new Promise(async (resolve, reject) => {
           let s = 0;
           let x = 0;
@@ -32,9 +43,19 @@ export class ColorUtilities{
           resolve(s);
         });
       }
+      //Private method to introduce a delay in solve method
+      //Just for User Xpercience
       private static pause() {
         return new Promise((r) => setTimeout(r, 0));
       }
+      /**
+       * Converts CMYK colors TO RGB code
+       * @param c Cyan value
+       * @param m Magenta value
+       * @param y Yellow value
+       * @param k Black value
+       * @returns array [r,g,b] color code
+       */
       public static cmyk2rgb(c: any, m: any, y: any, k: any) {
         c = c / 100;
         m = m / 100;
@@ -45,6 +66,13 @@ export class ColorUtilities{
         let b = parseInt(255 * (1 - y) * (1 - k) + '');
         return [r, g, b];
       }
+      /**
+       * Concerts RGB colors to Hexadecimal code
+       * @param r Red value
+       * @param g Green value
+       * @param b Blue Value
+       * @returns string with Hex code #FF0000 (example)
+       */
       public static rgbToHex = (r, g, b) =>
         '#' +
         [r, g, b]
@@ -53,14 +81,19 @@ export class ColorUtilities{
             return hex.length === 1 ? '0' + hex : hex;
           })
           .join('');
-      /**
-    <1 no perceptible
-    1-2 close close
-    2-10 perceptible at a glance
-    11-49 more similar than opposite
-    100 opposite
+
+   /**
+    * Calculates affinity between two colors (RGBA)
+    * <1 no perceptible
+    * 1-2 close close
+    * 2-10 perceptible at a glance
+    * 11-49 more similar than opposite
+    * 100 opposite
+    * @param rgbA first color [r,g,b]
+    * @param rgbB second color [r,g,b]
+    * @returns affinity 0-100
     */
-      public static deltaE(rgbA, rgbB) {
+    public static deltaE(rgbA, rgbB) {
         let labA = this.rgb2lab(rgbA);
         let labB = this.rgb2lab(rgbB);
         let deltaL = labA[0] - labB[0];
@@ -82,6 +115,8 @@ export class ColorUtilities{
           deltaHkhsh * deltaHkhsh;
         return i < 0 ? 0 : Math.sqrt(i);
       }
+      /** Internal method used by deltaE method
+       */
       private static rgb2lab(rgb) {
         let r = rgb[0] / 255,
           g = rgb[1] / 255,
@@ -100,7 +135,12 @@ export class ColorUtilities{
         z = z > 0.008856 ? Math.pow(z, 1 / 3) : 7.787 * z + 16 / 116;
         return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
       }
-    
+      /**
+       * Given a color, returns a color with high contrast
+       * @param hex original color (hexadecimal format)
+       * @param bw background color enforces a better contrast
+       * @returns hex code of the color with high contrast
+       */
       public static invertColor(hex, bw) {
         if (hex.indexOf('#') === 0) {
           hex = hex.slice(1);
@@ -126,7 +166,8 @@ export class ColorUtilities{
         // pad each with zeros and return
         return '#' + this.padZero(r) + this.padZero(g) + this.padZero(b);
       }
-    
+      /** Internal method used by invertColor
+       */
       public static padZero(str, len?) {
         len = len || 2;
         var zeros = new Array(len).join('0');

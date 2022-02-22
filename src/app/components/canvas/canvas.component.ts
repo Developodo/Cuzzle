@@ -15,7 +15,9 @@ import {
 })
 export class CanvasComponent implements OnInit {
   @ViewChild('canvas') _canvas: ElementRef;
+  //Receive optionally the param color to be filled with
   @Input('color') color?: any;
+  //Emits showGameHelp event when canvas is clicked
   @Output() showGameHelp = new EventEmitter<string>();
 
   private canvas: HTMLCanvasElement;
@@ -27,17 +29,33 @@ export class CanvasComponent implements OnInit {
       this.fill(this.color);
     }
   }
-
-  public setSize(width: number, heigh: number) {
+  /**
+   * Set the dimmesions of canvas
+   * @param width px
+   * @param heigh px
+   */
+  public setSize(width: number, heigh: number):void {
     this.canvas.width = width;
     this.canvas.height = heigh;
   }
-  public fill(color: string) {
+  /**
+   * Fills with a solid color the canvas
+   * @param color RGB code
+   */
+  public fill(color: string):void {
     let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
     ctx.fillStyle = color;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
-  public async drawImage(image: string, dx = 0, dy = 0,size=256) {
+  /**
+   * Draw an image in canvas
+   * @param image url or data
+   * @param dx horizontal displacement (px)
+   * @param dy vertical displacement (px)
+   * @param size width and height of image (suppposed to be square shaped)
+   * @returns null when image is loaded and ready to be rendered
+   */
+  public async drawImage(image: string, dx = 0, dy = 0,size=256):Promise<null> {
     return new Promise((resolve, reject) => {
       let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
       let img = new Image();
@@ -58,7 +76,14 @@ export class CanvasComponent implements OnInit {
       img.setAttribute('src', image);
     });
   }
-  public drawcropImage(size = 256, url) {
+  /**
+   * It draws an image in the canvas, taking size param to make a square centered cropped
+   * image from url
+   * @param size size of square in pixels
+   * @param url the url of image
+   * @returns null when image is loaded and ready to be rendered
+   */
+  public drawcropImage(size = 256, url):Promise<null> {
     return new Promise((resolve, reject) => {
       const ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
 
@@ -80,12 +105,19 @@ export class CanvasComponent implements OnInit {
         let dy = Math.abs(size - image.height) / 2;
         if (image.width > image.height)
           ctx.drawImage(image, -dx, 0, size + dx, image.height);
-        else ctx.drawImage(image, 0, -dy, image.width, size + dy);
+        else 
+          ctx.drawImage(image, 0, -dy, image.width, size + dy);
         resolve(null);
       };
     });
   }
-  public drawTry(color: string, n: any = 1) {
+  /**
+   * It draws a triangle from left bottom corner with a background color.
+   * It is used for showing to the player the color of the last trying
+   * @param color RRB color to draw the triangle
+   * @param n number indicating trying (1,2,3)
+   */
+  public drawTry(color: string, n: any = 1):void {
     let parts = this.canvas.width / 3;
     let ctx: CanvasRenderingContext2D = this.canvas.getContext('2d');
     ctx.fillStyle = color;
@@ -107,13 +139,13 @@ export class CanvasComponent implements OnInit {
       this.canvas.height - parts * (n - 1) - 10
     );
   }
-  public getColor(xCoord, yCoord) {
-    const [r, g, b] = this.canvas
-      .getContext('2d')
-      .getImageData(xCoord, yCoord, 1, 1).data;
-    return [r, g, b];
-  }
-  public invertColor(hex, bw) {
+  /**
+   * It returns de opposite color of the given one
+   * @param hex color used to searh the opposite
+   * @param bw background color for better contrast
+   * @returns the RGB code
+   */
+  public invertColor(hex, bw):string {
     if (hex.indexOf('#') === 0) {
       hex = hex.slice(1);
     }
@@ -138,26 +170,48 @@ export class CanvasComponent implements OnInit {
     // pad each with zeros and return
     return '#' + this.padZero(r) + this.padZero(g) + this.padZero(b);
   }
-
   public padZero(str, len?) {
     len = len || 2;
     var zeros = new Array(len).join('0');
     return (zeros + str).slice(-len);
   }
-  showHelp(value?: string) {
+  /**
+   * It triggers the event called showGameHeld listened (optionally) by parent component
+   * @param value nothing useful in this case. Only for demostration purpose
+   */
+  public showHelp(value?: string):void {
     this.showGameHelp.emit(value);
   }
-  public clear(){
+  /**
+   * It erases all canvas info
+   */
+  public clear():void{
     this.canvas.getContext("2d").clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
-  public getImageData(size=256){
-    this.canvas.getContext('2d').createImageData(size, size);
+  /**
+   * It gets the ImageData forma a square of canvas
+   * @param size size in pixel of square required
+   * @returns the image data from the square
+   */
+  public getImageData(size=256):ImageData{
+    return this.canvas.getContext('2d').createImageData(size, size);
   }
-  public getImageDataByCoord(x,y){
+  /**
+   * Return info (RGBA) from a pixel of canvas
+   * @param x horizontal coord
+   * @param y vertical coord
+   * @returns Array -> [R,G,B,Alpha]
+   */
+  public getImageDataByCoord(x,y):Uint8ClampedArray{
     return this.canvas.getContext('2d').getImageData(x, y, 1, 1).data;
   }
-  
-  public setImageDataByCoord(x,y,color){
+  /**
+   * It paints a pixel in the canvas
+   * @param x horizontal coord
+   * @param y vertical coord
+   * @param color color in RCG code
+   */
+  public setImageDataByCoord(x,y,color):void{
     let context=this.canvas.getContext('2d');
     context.beginPath();
     context.fillStyle = color;

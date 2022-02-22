@@ -1,11 +1,9 @@
 import {
   Component,
-  ElementRef,
   OnInit,
   ViewChild,
-  asNativeElements,
 } from '@angular/core';
-import { Platform, IonRange, ModalController } from '@ionic/angular';
+import { Platform,ModalController } from '@ionic/angular';
 import { ImageGeneratorService } from '../../services/image-generator.service';
 import { UiService } from '../../services/ui.service';
 import { NewPage } from '../new/new.page';
@@ -23,15 +21,12 @@ export class GamePage implements OnInit {
   @ViewChild('solution') solutionCanvas: CanvasComponent;
   @ViewChild('tries') triesCanvas: CanvasComponent;
   @ViewChild('pixels') pixelsCanvas: CanvasComponent;
-
   @ViewChild('ranges') ranges:RangesComponent;
-
   @ViewChild('info') info: HTMLDivElement;
 
   width: number;
   height: number;
-  image;
-  imageData;
+  imageData:ImageData;
   map = new Array(256);
   nTry = 0;
   valuesTray = [];
@@ -74,7 +69,9 @@ export class GamePage implements OnInit {
   ngOnInit(): void {
     this.card = document.querySelector('.card');
   }
-
+  /**
+   * Loads new data and prepares canvas sizes.
+   */
   async ionViewDidEnter() {
     await this.UI.showLoading();
     let already = await localStorage.getItem(this.iG.getToday());
@@ -102,18 +99,27 @@ export class GamePage implements OnInit {
     this.showPanel('main');
     this.showPanel('panel');
   }
-  public play(next = false) {
-    //ask if finished
+  /**
+   * Clears all parameter. Gets first color to be found.
+   * Prepares canvas.
+   * @param next 
+   */
+  public play(next = false):void {
     this.nTry = 0;
     this.valuesTray = [];
     this.triesCanvas.clear();
     const [x, y] = this.getCoord(next);
 
-    const [r, g, b] = this.solutionCanvas.getColor(x, y);
+    const [r, g, b] = this.solutionCanvas.getImageDataByCoord(x, y);
     this.currentRGB = [r, g, b];
     this.puzzleCanvas.fill(ColorUtilities.rgbToHex(r, g, b));
   }
-  public doTry(d) {
+  /**
+   * It calculates the affinity of the color introduced by user and
+   * the color to be found. It Opens info card for feedback.
+   * @param d Array [C,M,Y.K] with the values of color ranges
+   */
+  public doTry(d):void {
     if (this.nTry == 3) return;
     const [r, g, b] = ColorUtilities.cmyk2rgb(d.c, d.m, d.y, d.k);
     this.nTry++;
@@ -132,8 +138,11 @@ export class GamePage implements OnInit {
       color: [r, g, b],
     });
   }
-
-  public reset() {
+  /**
+   * Start over again the game. 
+   * Reseting all parameters and canvas.
+   */
+  public reset():void {
     this.completed = 0;
     this.Tint = 100;
     this.pixelsCanvas.clear();
@@ -146,8 +155,12 @@ export class GamePage implements OnInit {
     this.showButtonR = false;
     this.flipToTools();
   }
-
-  private async openNew(info?) {
+  /**
+   * Opens new Page in modal view
+   * @param info to be injected in modal page
+   * @returns a promise resolved when modal is presented
+   */
+  private async openNew(info?):Promise<void> {
     const modal = await this.modalController.create({
       component: NewPage,
       cssClass: 'my-custom-class',
@@ -165,7 +178,14 @@ export class GamePage implements OnInit {
     });
     return await modal.present();
   }
-
+  /**
+   * It searchs in map variable the next pixel not solved yet, to be 
+   * defined as the next color to be found
+   * @param next true if the last color wasn't found by user in 3 attemps, and
+   * it's needed to search next color starting by the end of the array
+   * to give to the player a new opportunity with a new color.
+   * @returns [x,y] coord of the next pixel to be solved by player
+   */
   public getCoord(next?) {
     let x = 0;
     let y = 0;
@@ -273,17 +293,13 @@ export class GamePage implements OnInit {
     let d=this.ranges.getValues();
     const [r, g, b] = ColorUtilities.cmyk2rgb(d.c, d.m, d.y, d.k);
     await this.UI.showLoading();
-    //this.hidePanel("main");
-    //pasar el color en cuestión.
     let founds = await ColorUtilities.solve(
-      /*[r, g, b],*/
       this.currentRGB,
       this.tmpP,
       this.map,
       this.solutionCanvas,
       this.pixelsCanvas
     );
-    //this.showPanel("main");
     if (this.tmpP > 75) {
       this.Tint += 5;
     }

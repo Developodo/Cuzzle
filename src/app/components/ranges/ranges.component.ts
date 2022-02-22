@@ -11,6 +11,8 @@ export class RangesComponent implements OnInit {
   @ViewChild('magenta') magenta: IonRange;
   @ViewChild('yellow') yellow: IonRange;
   @ViewChild('black') black: IonRange;
+  //Emits OnDoTry event when the button is clicked, 
+  //returning all ranges values
   @Output() OnDoTry = new EventEmitter<any>();
   constructor() { }
 
